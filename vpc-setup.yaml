@@ -97,7 +97,7 @@
         region: "{{region}}"
         state: "{{state}}"
         tags:
-          Tag1: IGW
+          Tag: IGW
       register: igw_out
 
     - name: Set up public subnet route table
