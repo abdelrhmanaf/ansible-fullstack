@@ -1,0 +1,60 @@
+- name: Setup Bastion Host
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - name: Import VPC Var
+      include_vars: Variables/vpc_setup
+
+    - name: Import VPC Var
+      include_vars: Variables/output_vars
+
+    - name: create a new EC2 key pair
+      amazon.aws.ec2_key:
+        name: bastion
+        region: "{{region}}"
+      connection: local
+      register: keyout
+
+    - name: store login key
+      copy:
+        content: "{{keyout.key.private_key}}"
+        dest: ./bastion.pem
+      when: keyout.changed
+    
+    - name: create SG
+      amazon.aws.ec2_security_group:
+        name: Bastion_SG
+        description: security group for Basion Ins
+        vpc_id: "{{vpcid}}"
+        region: "{{region}}"
+        rules:
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: "{{MYIP}}"
+      register: BastionSG_out
+
+    - name: Create Ec2
+      amazon.aws.ec2_instance:
+        key_name: bastion
+        instance_type: "{{instance_type}}"
+        image_id: "{{bastion_ami}}" 
+        region: "{{region}}"
+        wait: true
+        wait_timeout: 300
+        exact_count: 1
+        tags:
+          Name: "Bastion_host"
+          Project: Basrtion
+        security_group: "Bastion_SG"
+        vpc_subnet_id: "{{pubsub1id}}"
+      register: bastionHost_out 
+
+
+      - name: Insert Update SG for Bastion in vars
+        blockinfile:
+          path: Variables/output_vars
+          backup: yes
+          block:
+            Bastion_SG: {{BastionSG_out.group.id}}

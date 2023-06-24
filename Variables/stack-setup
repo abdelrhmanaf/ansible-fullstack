@@ -1,0 +1,8 @@
+region: us-east-2
+instance_type: t2.micro
+
+nginx_ami: ami-0e820afa569e84cc1
+tomcat_ami: ami-0e820afa569e84cc1
+memcache_ami: ami-0e820afa569e84cc1
+rmq_ami: ami-0e820afa569e84cc1
+mysql_ami: ami-0e820afa569e84cc1

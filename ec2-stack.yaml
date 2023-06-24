@@ -1,0 +1,253 @@
+- name: Stack Setup
+- hosts: localhost
+  gather_facts: False
+
+  tasks:
+    - name: Import VPC Var
+      include_vars: Variables/output_vars
+    
+    - name: Import VPC Var
+      include_vars: Variables/stack-setup
+    
+    - name: create a new EC2 key pair
+      amazon.aws.ec2_key:
+        name: stack-key
+        region: "{{region}}"
+      connection: local
+      register: keyout
+
+    - name: store login key
+      copy:
+        content: "{{keyout.key.private_key}}"
+        dest: "./stack-key.pem"
+      when: keyout.changed
+    
+    - name: create SG for the LB
+      amazon.aws.ec2_security_group:
+        name: LoadBalancer
+        description: Allow port 80 form everywhere
+        vpc_id: "{{vpcid}}"
+        region: "{{region}}"
+        rules:
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0 
+      register: ELBSG_out
+    
+    - name: create SG for App
+      amazon.aws.ec2_security_group:
+        name: appSG
+        description: Allow port 22 form everywhere
+        vpc_id: "{{vpcid}}"
+        region: "{{region}}"
+        purge_rules: no
+        rules:
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: "{{BastionSGid}}"
+          
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: "{{ELBSG_out.group_id}}"             
+      register: APPSG_out
+      
+
+    - name: update SG for App
+      amazon.aws.ec2_security_group:
+        name: appSG
+        description: Allow port all for it self 
+        vpc_id: "{{vpcid}}"
+        region: "{{region}}"
+        purge_rules: no
+        rules:
+          - proto: all  
+            group_id: "{{APPSG_out.group.id}}" 
+
+    - name: Create Ngnix
+      amazon.aws.ec2_instance:
+        key_name: stack-key
+        instance_type: "{{instance_type}}"
+        image_id: "{{nginx_ami}}" 
+        region: "{{region}}"
+        wait: yes
+        wait_timeout: 300
+        exact_count: 1
+        tags:
+          Name: "web01"
+          Project: Devops
+        count_tag:
+          Name: "web01"
+          Project: Devops
+        security_group: "APPSG_out.group.id"
+        vpc_subnet_id: "{{privsub1id}}"
+      register: web01_out 
+      
+    - name: Create Tomcat
+      amazon.aws.ec2_instance:
+        key_name: stack-key
+        instance_type: "{{instance_type}}"
+        image_id: "{{tomcat_ami}}" 
+        region: "{{region}}"
+        wait: yes
+        wait_timeout: 300
+        exact_count: 1
+        tags:
+          Name: "app01"
+          Project: Devops
+        count_tag:
+          Name: "app01"
+          Project: Devops
+        security_group: "APPSG_out.group.id"
+        vpc_subnet_id: "{{privsub1id}}"
+      register: app01_out 
+
+    - name: Create Memcache
+      amazon.aws.ec2_instance:
+        key_name: stack-key
+        instance_type: "{{instance_type}}"
+        image_id: "{{memcache_ami}}" 
+        region: "{{region}}"
+        wait: yes
+        wait_timeout: 300
+        exact_count: 1
+        tags:
+          Name: "mc01"
+          Project: Devops
+        count_tag:
+          Name: "mc01"
+          Project: Devops
+        security_group: "APPSG_out.group.id"
+        vpc_subnet_id: "{{privsub1id}}"
+      register: mc01_out 
+
+
+    - name: Create RabbitMQ
+      amazon.aws.ec2_instance:
+        key_name: stack-key
+        instance_type: "{{instance_type}}"
+        image_id: "{{rmq_ami}}" 
+        region: "{{region}}"
+        wait: yes
+        wait_timeout: 300
+        exact_count: 1
+        tags:
+          Name: "rmq01"
+          Project: Devops
+        count_tag:
+          Name: "rmq01"
+          Project: Devops
+        security_group: "APPSG_out.group.id"
+        vpc_subnet_id: "{{privsub1id}}"
+      register: rmq01_out 
+    
+    - name: Create MYSQL
+      amazon.aws.ec2_instance:
+        key_name: stack-key
+        instance_type: "{{instance_type}}"
+        image_id: "{{mysql_ami}}" 
+        region: "{{region}}"
+        wait: yes
+        wait_timeout: 300
+        exact_count: 1
+        tags:
+          Name: "db01"
+          Project: Devops
+        count_tag:
+          Name: "db01"
+          Project: Devops
+        security_group: "APPSG_out.group.id"
+        vpc_subnet_id: "{{privsub1id}}"
+      register: db01_out 
+
+    - debug: 
+        var: db01_out.tagged_instances[0].id
+
+    - amazon.aws.elb_application_lb:
+        name: "ELB"
+        region: "{{region}}"
+        state: present
+        instance_ids:
+          - "{{db01_out.tagged_instances[0].id}}"
+        security_groups: "{{ELBSG_out.group.id}}"
+        purge_instance_ids: yes
+        subnets:
+          - "{{pubsub1id}}"
+          - "{{pubsub2id}}"
+          - "{{pubsub3id}}"
+        listeners:
+      - Protocol: HTTP # Required. The protocol for connections from clients to the load balancer (HTTP or HTTPS) (case-sensitive).
+        Port: 80 # Required. The port on which the load balancer is listening.
+        # The security policy that defines which ciphers and protocols are supported. The default is the cu
+
+    - name: Insert/Update Hosts IP & Name in file provision-stack/group_vars/hostsip
+    blockinfile:
+        path: provision-stack/group_vars/hostsip
+        block: |
+          web01_ip: {{ web01_out.tagged_instances[0].private_ip }}
+          app01_ip: {{ app01_out.tagged_instances[0].private_ip }}
+          rmq01_ip: {{ rmq01_out.tagged_instances[0].private_ip }}
+          mc01_ip: {{ mc01_out.tagged_instances[0].private_ip }}
+          db01_ip: {{ db01_out.tagged_instances[0].private_ip }}
+
+    - name: Copy login key to provision_stack directory
+      copy:
+        src: stack-key.pem
+        dest: provision-stack/stack-key.pem
+        mode: '0400'
+
+  - name: Insert/Update Hosts IP & Name in file provision-stack/group_vars/hostsip
+    blockinfile:
+        path: provision-stack/group_vars/inventory
+        block: |
+          web01 ansible_host={{ web01_out.tagged_instances[0].private_ip }}
+          app01 ansible_host={{ app01_out.tagged_instances[0].private_ip }}
+          rmq01 ansible_host={{ rmq01_out.tagged_instances[0].private_ip }}
+          mc01 ansible_host={{ mc01_out.tagged_instances[0].private_ip }}
+          db01 ansible_host={{ db01_out.tagged_instances[0].private_ip }}
+          cntrl ansible_host=172.0.0.1 ansible_connection=local
+        
+        
+         [websrvgrp]
+          web01
+
+          [appsrvgrp]
+          app01
+
+          [rmqsrvgrp]
+          rmq01
+
+          [mcsrvgrp]
+          mc01
+
+          [dbsrvgrp]
+          db01
+
+          [control]
+          cntl
+
+          [stack_inst:children]
+          websrvgrp
+          appsrvgrp
+          rmqsrvgrp
+          mcsrvgrp
+          dbsrvgrp
+
+          [stack_inst:vars]
+          ansible_user=ubuntu
+          ansible_ssh_private_key_file=stack-key.pem
+          #ansible_python_interpreter=/usr/bin/python3
+
+
+    
+    
+    
+
+    
+
+
+
+
+
