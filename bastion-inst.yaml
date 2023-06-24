@@ -49,7 +49,7 @@
         tags:
           Name: "Bastion_host"
           Project: Basrtion
-      purge_tags: true
+        purge_tags: true
         security_group: "Bastion_SG"
         vpc_subnet_id: "{{pubsub1id}}"
       register: bastionHost_out 
