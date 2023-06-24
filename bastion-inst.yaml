@@ -53,7 +53,7 @@
 
 
     - name: Insert Update SG for Bastion in vars
-       blockinfile:
+      ansible.builtin.blockinfile:
         path: Variables/output_vars
         backup: yes
         block:
