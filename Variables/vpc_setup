@@ -24,5 +24,5 @@ state: present
 
 #Bastion
 ami: ami-0e820afa569e84cc1
-MYIP: 197.43.90.18/32
+MYIP: 197.43.138.215/32
 instance_type: t2.micro

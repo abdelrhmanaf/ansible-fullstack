@@ -52,9 +52,9 @@
       register: bastionHost_out 
 
 
-      - name: Insert Update SG for Bastion in vars
-        blockinfile:
-          path: Variables/output_vars
-          backup: yes
-          block:
-            Bastion_SG: {{BastionSG_out.group.id}}
+    - name: Insert Update SG for Bastion in vars
+       blockinfile:
+        path: Variables/output_vars
+        backup: yes
+        block:
+          Bastion_SG: {{BastionSG_out.group.id}}
