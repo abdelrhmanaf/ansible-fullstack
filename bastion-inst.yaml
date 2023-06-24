@@ -8,6 +8,8 @@
 
     - name: Import VPC Var
       include_vars: Variables/output_vars
+    - name: Import Stack 
+      include_vars: Variables/stack-setup      
 
     - name: create a new EC2 key pair
       amazon.aws.ec2_key:
