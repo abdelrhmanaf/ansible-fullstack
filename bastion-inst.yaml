@@ -50,10 +50,10 @@
           Name: "Bastion_host"
           Project: Basrtion
         purge_tags: true
-        security_group: "Bastion_SG"
+        security_group: 
+          group_id: "{{Bastion_SG.group.id}}"
         vpc_subnet_id: "{{pubsub1id}}"
       register: bastionHost_out 
-
 
     - name: Insert Update SG for Bastion in vars
       ansible.builtin.blockinfile:
