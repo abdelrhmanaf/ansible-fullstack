@@ -40,6 +40,7 @@
     - name: Debug BastionSG_out
       debug:
         var: BastionSG_out
+
     - name: Check if EC2 instance exists
       amazon.aws.ec2_instance_info:
         region: "{{region}}"
@@ -71,3 +72,4 @@
         backup: yes
         block:
           Bastion_SG: "{{BastionSG_out.group.id}}"
+        changed_when: true
