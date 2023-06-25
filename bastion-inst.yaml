@@ -37,6 +37,9 @@
             cidr_ip: "{{MYIP}}"
       register: BastionSG_out
 
+    - name: Debug BastionSG_out
+      debug:
+        var: BastionSG_out
     - name: Check if EC2 instance exists
       amazon.aws.ec2_instance_info:
         region: "{{region}}"
