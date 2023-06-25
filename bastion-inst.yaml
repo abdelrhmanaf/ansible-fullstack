@@ -50,7 +50,7 @@
           Name: "Bastion_host"
           Project: Basrtion
         purge_tags: true
-        security_group: "{{BastionSG_out}}"
+        security_group: "{{BastionSG_out.group_id}}"
         vpc_subnet_id: "{{pubsub1id}}"
       register: bastionHost_out 
 
