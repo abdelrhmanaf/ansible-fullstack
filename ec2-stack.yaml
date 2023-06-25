@@ -165,12 +165,13 @@
     - debug: 
         var: db01_out.tagged_instances[0].id
 
-    - amazon.aws.elb_application_lb:
+    - local_action:
+      amazon.aws.elb_application_lb:
         name: "ELB"
         region: "{{region}}"
         state: present
         instance_ids:
-          - "{{db01_out.tagged_instances[0].id}}"
+          - "{{web01_out.tagged_instances[0].id}}"
         security_groups: "{{ELBSG_out.group.id}}"
         purge_instance_ids: yes
         subnets:
@@ -178,9 +179,8 @@
           - "{{pubsub2id}}"
           - "{{pubsub3id}}"
         listeners:
-      - Protocol: HTTP # Required. The protocol for connections from clients to the load balancer (HTTP or HTTPS) (case-sensitive).
-        Port: 80 # Required. The port on which the load balancer is listening.
-        # The security policy that defines which ciphers and protocols are supported. The default is the cu
+        - Protocol: HTTP
+          Port: 80
 
     - name: Insert/Update Hosts IP & Name in file provision-stack/group_vars/hostsip
     blockinfile:
