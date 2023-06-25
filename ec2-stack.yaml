@@ -198,8 +198,8 @@
         dest: provision-stack/stack-key.pem
         mode: '0400'
 
-  - name: Insert/Update Hosts IP & Name in file provision-stack/group_vars/hostsip
-    blockinfile:
+    - name: Insert/Update Hosts IP & Name in file provision-stack/group_vars/hostsip
+      blockinfile:
         path: provision-stack/group_vars/inventory
         block: |
           web01 ansible_host={{ web01_out.tagged_instances[0].private_ip }}
