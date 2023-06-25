@@ -183,7 +183,7 @@
           Port: 80
 
     - name: Insert/Update Hosts IP & Name in file provision-stack/group_vars/hostsip
-    blockinfile:
+      blockinfile:
         path: provision-stack/group_vars/hostsip
         block: |
           web01_ip: {{ web01_out.tagged_instances[0].private_ip }}
