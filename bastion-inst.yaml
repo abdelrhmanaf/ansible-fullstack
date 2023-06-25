@@ -64,6 +64,6 @@
 
     - name: store Bastion SG
       copy:
-        insertafter: EOF
+        follow: true
         content: "BastionSGid: {{BastionSG_out.group_id}}\n"
         dest: Variables/output_vars
