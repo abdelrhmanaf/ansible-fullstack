@@ -59,7 +59,7 @@
           Project: Basrtion
         security_group: "Bastion_SG"
         vpc_subnet_id: "{{pubsub1id}}"
-      register: bastionHost_out 
+        register: bastionHost_out 
       when: ec2_info.instances == []
 
     - name: Insert Update SG for Bastion in vars
