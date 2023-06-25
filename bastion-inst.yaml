@@ -62,8 +62,8 @@
       register: bastionHost_out 
       when: ec2_info.instances == []
 
-    - name: store Bastion SG
-      copy:
-        local_follow: true
-        content: "BastionSGid: {{BastionSG_out.group_id}}\n"
-        dest: Variables/output_vars
+    - name: Insert/Update 
+      ansible.builtin.blockinfile:
+        path: Variables/output_vars
+        block: 
+          BasionSGid:"{{BastionSG_out.group_id}}"
