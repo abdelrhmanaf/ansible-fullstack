@@ -37,12 +37,20 @@
             cidr_ip: "{{MYIP}}"
       register: BastionSG_out
 
+    - name: Check if EC2 instance exists
+      amazon.aws.ec2_instance_info:
+        region: "{{region}}"
+        filters:
+          "tag:Name": Bastion_host
+    register: ec2_info
+
     - name: Create Ec2
       amazon.aws.ec2_instance:
         key_name: bastion
         instance_type: "{{instance_type}}"
         image_id: "{{bastion_ami}}" 
         region: "{{region}}"
+        purge_tags: true
         wait: true
         wait_timeout: 300
         exact_count: 1
@@ -52,6 +60,7 @@
         security_group: "Bastion_SG"
         vpc_subnet_id: "{{pubsub1id}}"
       register: bastionHost_out 
+      when: ec2_info.instances == []
 
     - name: Insert Update SG for Bastion in vars
       ansible.builtin.blockinfile:
