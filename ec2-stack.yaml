@@ -1,5 +1,5 @@
 - name: Stack Setup
-- hosts: localhost
+- hosts: all
   connection: local
   gather_facts: False
 
