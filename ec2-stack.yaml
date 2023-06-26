@@ -169,20 +169,20 @@
     - local_action:
       hosts:
       module: amazon.aws.elb_application_lb
-        name: "ELB"
-        region: "{{region}}"
-        state: present
-        instance_ids:
-          - "{{web01_out.tagged_instances[0].id}}"
-        security_groups: "{{ELBSG_out.group.id}}"
-        purge_instance_ids: yes
-        subnets:
-          - "{{pubsub1id}}"
-          - "{{pubsub2id}}"
-          - "{{pubsub3id}}"
-        listeners:
-        - Protocol: HTTP
-          Port: 80
+      name: "ELB"
+      region: "{{region}}"
+      state: present
+      instance_ids:
+        - "{{web01_out.tagged_instances[0].id}}"
+      security_groups: "{{ELBSG_out.group.id}}"
+      purge_instance_ids: yes
+      subnets:
+        - "{{pubsub1id}}"
+        - "{{pubsub2id}}"
+        - "{{pubsub3id}}"
+      listeners:
+      - Protocol: HTTP
+        Port: 80
 
     - name: Insert/Update Hosts IP & Name in file provision-stack/group_vars/hostsip
       blockinfile:
