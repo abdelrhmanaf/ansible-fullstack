@@ -166,7 +166,7 @@
         var: db01_out.tagged_instances[0].id
 
     - local_action:
-        module: amazon.aws.elb_application_lb:
+        module: amazon.aws.elb_application_lb
         name: "ELB"
         region: "{{region}}"
         state: present
