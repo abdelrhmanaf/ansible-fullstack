@@ -208,35 +208,35 @@
           mc01 ansible_host={{ mc01_out.tagged_instances[0].private_ip }}
           db01 ansible_host={{ db01_out.tagged_instances[0].private_ip }}
           cntrl ansible_host=172.0.0.1 ansible_connection=local
-        [websrvgrp]
-        web01
+        
+          [websrvgrp]
+          web01
 
-        [appsrvgrp]
-        app01
+          [appsrvgrp]
+          app01
 
-        [rmqsrvgrp]
-        rmq01
+          [rmqsrvgrp]
+          rmq01
 
-        [mcsrvgrp]
-        mc01
+          [mcsrvgrp]
+          mc01
 
-        [dbsrvgrp]
-        db01
+          [dbsrvgrp]
+          db01
 
-        [control]
-        cntl
+          [control]
+          cntl
 
-        [stack_inst:children]
-        websrvgrp
-        appsrvgrp
-        rmqsrvgrp
-        mcsrvgrp
-        dbsrvgrp
+          [stack_inst:children]
+          websrvgrp
+          appsrvgrp
+          rmqsrvgrp
+          mcsrvgrp
+          dbsrvgrp
 
-        [stack_inst:vars]
-        ansible_user=ubuntu
-        ansible_ssh_private_key_file=stack-key.pem
-          #ansible_python_interpreter=/usr/bin/python3
+          [stack_inst:vars]
+          ansible_user=ubuntu
+          ansible_ssh_private_key_file=stack-key.pem
 
 
     
