@@ -52,7 +52,7 @@
           - proto: tcp
             from_port: 22
             to_port: 22
-            group_id: "{{BasionSGid}}"
+            group_id: "{{BastionSGid}}"
       register: StackSG_out
 
     - name: Update Securiry Group with its own sg id
