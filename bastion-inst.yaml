@@ -66,7 +66,7 @@
       ansible.builtin.blockinfile:
         path: Variables/output_vars
         block: |
-          BasionSGid: {{  BastionSG_out.group_id }}
+          BastionSGid: {{  BastionSG_out.group_id }}
         marker: "# {mark} ANSIBLE MANAGED BLOCK {mark}"
 
     - name: Remove comment from file
