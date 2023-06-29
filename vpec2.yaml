@@ -7,25 +7,25 @@
     - name: Import VPC Var
       include_vars: Variables/output_vars
     
-    - name: Import VPC Var
+    - name: Import Stack
       include_vars: Variables/stack-setup
 
-    - name: Create vprofile ec2 key
-      ec2_key:
-        name: vprokey
+    - name: Create ec2 key
+       amazon.aws.ec2_key:
+        name: key
         region: "{{region}}"
-      register: vprokey_out
+      register: key_out
 
     - name: Save private key into file loginkey_vpro.pem
       copy:
-        content: "{{vprokey_out.key.private_key}}"
+        content: "{{key_out.key.private_key}}"
         dest: "./loginkey_vpro.pem"
         mode: 0600
-      when: vprokey_out.changed
+      when: key_out.changed
 
     - name: Create Securiry Group for Load Balancer
       amazon.aws.ec2_security_group:
-        name: vproELB-sg
+        name: ELB-sg
         description: Allow port 80 from everywhere and all port within sg
         region: "{{region}}"
         vpc_id: "{{vpcid}}"
@@ -34,11 +34,11 @@
             from_port: 80
             to_port: 80
             cidr_ip: 0.0.0.0/0
-      register: vproELBSG_out
+      register: ELBSG_out
 
-    - name: Create Securiry Group for Vprofile Stack
+    - name: Create Securiry Group for  Stack
       amazon.aws.ec2_security_group:
-        name: vproStack-sg
+        name: Stack-sg
         description: Allow port 22 from everywhere and all port within sg
         region: "{{region}}"
         vpc_id: "{{vpcid}}"
@@ -47,28 +47,28 @@
           - proto: tcp
             from_port: 80
             to_port: 80
-            group_id: "{{vproELBSG_out.group_id}}"
+            group_id: "{{ELBSG_out.group_id}}"
 
           - proto: tcp
             from_port: 22
             to_port: 22
             group_id: "{{BastionSGid}}"
-      register: vproStackSG_out
+      register: StackSG_out
 
     - name: Update Securiry Group with its own sg id
       amazon.aws.ec2_security_group:
-        name: vproStack-sg
+        name: Stack-sg
         description: Allow port 22 from everywhere and all port within sg
         region: "{{region}}"
         vpc_id: "{{vpcid}}"
         purge_rules: no
         rules:
           - proto: all
-            group_id: "{{vproStackSG_out.group_id}}"
+            group_id: "{{StackSG_out.group_id}}"
 
     - name: Creating Nginx web01
       amazon.aws.ec2_instance:
-        key_name: vprokey
+        key_name: key
         region: "{{region}}"
         instance_type: t2.micro
         image_id: "{{nginx_ami}}"
@@ -83,13 +83,13 @@
           Name: "web01"
           Project: Vprofile
           Owner: DevOps Team
-        security_group: "{{vproStackSG_out.group_id}}"
+        security_group: "{{StackSG_out.group_id}}"
         vpc_subnet_id: "{{privsub1id}}"
       register: web01_out
 
     - name: Creating tomcat app01
       amazon.aws.ec2_instance:
-        key_name: vprokey
+        key_name: key
         region: "{{region}}"
         instance_type: t2.micro
         image_id: "{{tomcat_ami}}"
@@ -104,13 +104,13 @@
           Name: "app01"
           Project: Vprofile
           Owner: DevOps Team
-        security_group: "{{vproStackSG_out.group_id}}"
+        security_group: "{{StackSG_out.group_id}}"
         vpc_subnet_id: "{{privsub1id}}"
       register: app01_out
 
     - name: Creating memcache mc01
       amazon.aws.ec2_instance:
-        key_name: vprokey
+        key_name: key
         region: "{{region}}"
         instance_type: t2.micro
         image_id: "{{memcache_ami}}"
@@ -125,13 +125,13 @@
           Name: "mc01"
           Project: Vprofile
           Owner: DevOps Team
-        security_group: "{{vproStackSG_out.group_id}}"
+        security_group: "{{StackSG_out.group_id}}"
         vpc_subnet_id: "{{privsub1id}}"
       register: mc01_out
 
     - name: Creating RabbitMQ rmq01
       amazon.aws.ec2_instance:
-        key_name: vprokey
+        key_name: key
         region: "{{region}}"
         instance_type: t2.micro
         image_id: "{{rmq_ami}}"
@@ -146,13 +146,13 @@
           Name: "rmq01"
           Project: Vprofile
           Owner: DevOps Team
-        security_group: "{{vproStackSG_out.group_id}}"
+        security_group: "{{StackSG_out.group_id}}"
         vpc_subnet_id: "{{privsub1id}}"
       register: rmq01_out
 
     - name: Creating Mysql db01
       amazon.aws.ec2_instance:
-        key_name: vprokey
+        key_name: key
         region: "{{region}}"
         instance_type: t2.micro
         image_id: "{{mysql_ami}}"
@@ -167,7 +167,7 @@
           Name: "db01"
           Project: Vprofile
           Owner: DevOps Team
-        security_group: "{{vproStackSG_out.group_id}}"
+        security_group: "{{StackSG_out.group_id}}"
         vpc_subnet_id: "{{privsub1id}}"
       register: db01_out
 
@@ -176,10 +176,10 @@
 
     - local_action:
         module: amazon.aws.elb_application_lb
-        name: "vprofile-elb"
+        name: "app-elb"
         region: "{{region}}"
         state: present
-        security_groups: "{{vproELBSG_out.group_id}}"
+        security_groups: "{{ELBSG_out.group_id}}"
         subnets:
           - "{{ pubsub1id }}"
           - "{{ pubsub2id }}"
