@@ -18,7 +18,7 @@
       git:
         repo: 'https://github.com/abdelrhmanaf/ansible-fullstack.git'
         dest: ./App-repo
-        version: vp-rem
+        version: master
       register: git_status
 
 
