@@ -1,2 +1,5 @@
 stack-key.pem
 bastion.pem
+loginkey_vpro.pem
+provision-stack/loginkey_vpro.pem
+

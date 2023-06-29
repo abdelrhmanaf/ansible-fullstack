@@ -1,6 +1,5 @@
 region: us-east-2
 instance_type: t2.micro
-
 bastion_ami: ami-024e6efaf93d85776
 nginx_ami: ami-024e6efaf93d85776
 tomcat_ami: ami-024e6efaf93d85776
