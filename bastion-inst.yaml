@@ -65,5 +65,12 @@
     - name: Insert/Update 
       ansible.builtin.blockinfile:
         path: Variables/output_vars
-        block: 
-          BasionSGid:"{{BastionSG_out.group_id}}"
+        block: |
+          BasionSGid: {{  BastionSG_out.group_id }}
+        marker: "# {mark} ANSIBLE MANAGED BLOCK {mark}"
+
+    - name: Remove comment from file
+      lineinfile:
+        path: Variables/output_vars
+        state: absent
+        regexp: '# BEGIN ANSIBLE MANAGED BLOCK|# END ANSIBLE MANAGED BLOCK'
