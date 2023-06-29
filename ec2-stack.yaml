@@ -164,7 +164,7 @@
       register: db01_out 
 
     - debug: 
-        var: db01_out.tagged_instances[0].id
+        var: db01_out.instances[0].id
 
     - name: Create ELB
       amazon.aws.elb_application_lb:
@@ -173,7 +173,7 @@
         state: present
         instance_ids:
           - "{{web01_out.tagged_instances[0].id}}"
-        security_groups: "{{ELBSG_out.group.id}}"
+        security_groups: "{{ELBSG_out.group_id}}"
         purge_instance_ids: yes
         subnets:
           - "{{pubsub1id}}"
@@ -182,16 +182,19 @@
         listeners:
         - Protocol: HTTP
           Port: 80
+	  DefaultActions:
+          	- Type: forward # Required.
+          	  TargetGroupName: # Required. The name of the target group
 
     - name: Insert/Update Hosts IP & Name in file provision-stack/group_vars/hostsip
       blockinfile:
         path: provision-stack/group_vars/hostsip
         block: |
-          web01_ip: {{ web01_out.tagged_instances[0].private_ip }}
-          app01_ip: {{ app01_out.tagged_instances[0].private_ip }}
-          rmq01_ip: {{ rmq01_out.tagged_instances[0].private_ip }}
-          mc01_ip: {{ mc01_out.tagged_instances[0].private_ip }}
-          db01_ip: {{ db01_out.tagged_instances[0].private_ip }}
+          web01_ip: {{ web01_out.instances[0].private_ip_address }}
+          app01_ip: {{ app01_out.instances[0].private_ip_address}}
+          rmq01_ip: {{ rmq01_out.instances[0].private_ip_address }}
+          mc01_ip: {{ mc01_out.instances[0].private_ip_address }}
+          db01_ip: {{ db01_out.instances[0].private_ip_address }}
 
     - name: Copy login key to provision_stack directory
       copy:
