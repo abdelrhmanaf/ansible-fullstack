@@ -11,7 +11,7 @@
       include_vars: Variables/stack-setup
 
     - name: Create ec2 key
-       amazon.aws.ec2_key:
+      amazon.aws.ec2_key:
         name: key
         region: "{{region}}"
       register: key_out
