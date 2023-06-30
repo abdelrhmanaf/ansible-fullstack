@@ -2,7 +2,7 @@
   hosts: all
   tasks:
     - name: Import VPC setup Variable
-      include_vars: Variables/hostsip
+      include_vars: provision-stack/group_vars
 
     - name: Update hosts file for all the hosts
       blockinfile:
