@@ -16,9 +16,9 @@
 
     - name: Clone source code from github
       git:
-        repo: 'https://github.com/abdelrhmanaf/CICD'
+        repo: 'ttps://github.com/devopshydclub/vprofile-project.git'
         dest: ./App-repo
-        version: master
+        version: vp-rem
       register: git_status
 
 
