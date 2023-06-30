@@ -16,7 +16,7 @@
 
     - name: Clone source code from github
       git:
-        repo: 'ttps://github.com/devopshydclub/vprofile-project.git'
+        repo: 'https://github.com/devopshydclub/vprofile-project.git'
         dest: ./App-repo
         version: vp-rem
       register: git_status
