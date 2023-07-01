@@ -34,13 +34,6 @@
         - package
 
 
-    - name: Install Rabbit MQ
-      apt:
-        name: rabbitmq-server
-        state: present
-        update_cache: yes
-      tags:
-        - package
 
 
     - name: Start & Enable RMQ
