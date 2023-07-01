@@ -32,7 +32,7 @@
 
     - name: Deploy web config file
       template:
-        src: templates/nginxvpro.j2
+        src: templates/nginx.j2
         dest: /etc/nginx/sites-available/vproapp
       tags:
         - conf
