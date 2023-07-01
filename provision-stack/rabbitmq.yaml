@@ -35,6 +35,9 @@
 
     - apt_repository:
         repo: deb https://dl.bintray.com/rabbitmq/debian bionic main
+	apt:
+    		update_cache: yes
+    		upgrade: yes
         state: present
       tags:
         - package
