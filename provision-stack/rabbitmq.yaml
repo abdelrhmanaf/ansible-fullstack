@@ -34,7 +34,7 @@
         - package
 
     - apt_repository:
-        repo: deb http://binaries.erlang-solutions.com/debian/dists bionic main
+        repo: deb http://ppa.launchpad.net/rabbitmq/rabbitmq-erlang/ubuntu/dists bionic main
         state: present
       tags:
         - package
