@@ -33,11 +33,6 @@
       tags:
         - package
 
-    - apt_repository:
-        repo: deb https://packages.erlang-solutions.com/ubuntu jammy contrib
-        state: present
-      tags:
-        - package
 
     - name: Install Rabbit MQ
       apt:
