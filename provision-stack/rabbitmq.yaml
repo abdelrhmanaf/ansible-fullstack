@@ -34,10 +34,7 @@
         - package
 
     - apt_repository:
-        repo: deb https://dl.bintray.com/rabbitmq/debian bionic main
-	apt:
-    		update_cache: yes
-    		upgrade: yes
+        repo: deb http://binaries.erlang-solutions.com/debian/dists bionic main
         state: present
       tags:
         - package
