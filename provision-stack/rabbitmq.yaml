@@ -26,9 +26,6 @@
       tags:
         - package
 
-    - name: Update apt cache
-      apt:
-        update_cache: yes
 
     - name: Install RabbitMQ package
       apt:
