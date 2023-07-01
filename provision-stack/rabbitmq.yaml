@@ -6,7 +6,7 @@
   tasks:
     - name: Install Erlang Repository Package
       apt:
-        deb: https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
+        deb: https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb
       tags:
         - package
 
@@ -28,7 +28,7 @@
 
     - name: Add an Apt signing key, uses whichever key is at the URL
       apt_key:
-        url: https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.12.1/rabbitmq-server_3.12.1-1_all.deb
+        url: https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc
         state: present
       tags:
         - package
