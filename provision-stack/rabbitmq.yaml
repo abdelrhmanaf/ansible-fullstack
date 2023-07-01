@@ -34,7 +34,7 @@
         - package
 
     - apt_repository:
-        repo: deb http://ppa.launchpad.net/rabbitmq/rabbitmq-erlang/ubuntu/dists/ jammy  Release
+        repo: deb https://dl.bintray.com/rabbitmq/debian bionic main
         state: present
       tags:
         - package
