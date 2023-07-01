@@ -34,7 +34,7 @@
         - package
 
     - apt_repository:
-        repo: deb https://dl.bintray.com/rabbitmq/debian bionic main
+        repo: deb https://packages.erlang-solutions.com/ubuntu jammy contrib
         state: present
       tags:
         - package
