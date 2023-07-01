@@ -1,5 +1,5 @@
 - name: Set host to ip mapping in /etc/hosts file of all the instances in the stack
-  hosts: stack_inst
+  hosts: stack_inst, localhost
   gather_facts: yes
   become: true
   tasks:
